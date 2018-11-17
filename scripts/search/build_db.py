@@ -75,6 +75,7 @@ def persist_corpus(data_path: str, uri: str, processes: int):
     file_names = [file_name for file_name in get_files_gen(data_path)]
 
     db.drop_db()
+    db.
 
     with tqdm(total=len(file_names)) as progress:
         for docs in tqdm(ppool.imap_unordered(worker_job, file_names)):

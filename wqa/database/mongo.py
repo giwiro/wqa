@@ -18,6 +18,9 @@ class MongoDatabase(AbstractDatabase):
         db = self.client[DB_NAME]
         db.drop_collection(TABLE_NAME)
 
+    def start_transaction(self):
+        db = self.client[DB_NAME]
+
     def insert_many(self, items: [Dict[str, str]]) -> [Dict[str, str]]:
         db = self.client[DB_NAME]
         inserted = db[TABLE_NAME].insert_many(items)

@@ -28,5 +28,9 @@ class AbstractDatabase(ABC):
         pass
 
     @abstractmethod
+    def start_transaction(self):
+        pass
+
+    @abstractmethod
     def insert_many(self, items: [Dict[str, str]]) -> [Dict[str, str]]:
         pass
