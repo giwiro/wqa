@@ -8,8 +8,8 @@ numpy = "*"
 pymongo = "*"
 regex = "*"
 tqdm = "*"
+wikiextractor = "*"
 
 [dev-packages]
-
-[requires]
-python_version = "3.6"
+# [requires]
+# python_version = "3.6"
