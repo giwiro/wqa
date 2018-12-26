@@ -8,4 +8,4 @@ setup(name="wqa",
       author_email="giwirodavalos@gmail.com",
       license="MIT",
       packages=find_packages(),
-      install_requires=["numpy", "pymongo", "regex", "tqdm"])
+      install_requires=["numpy", "pymongo", "tqdm"])

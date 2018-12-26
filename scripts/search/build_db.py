@@ -7,7 +7,7 @@ import unicodedata
 from multiprocessing.pool import Pool as ProcessPool
 from typing import Dict, Optional
 
-import regex
+import re
 from tqdm import tqdm
 
 from wqa.database import DatabaseFactory
@@ -30,16 +30,17 @@ def get_files_gen(data_path: str):
 def process_doc(doc: Dict) -> Optional[Dict[str, str]]:
     new_doc = {"title": doc.get("title"), "text": doc.get("text")}
     # if it´s a disambiguation article then ignore it
-    if '(disambiguation)' in new_doc.get("title").lower():
+    if '(desambiguación)' in new_doc.get("title").lower():
         return None
-    if '(disambiguation page)' in new_doc.get("title").lower():
+    if '(página de desambiguación)' in new_doc.get("title").lower():
         return None
 
     # If title contains some link stuff, then ignore it
-    if regex.match(r'(List of .+)|(Index of .+)|(Outline of .+)',
-                   new_doc.get("title")):
-        return None
-
+    #if regex.match(r'(List of .+)|(Index of .+)|(Outline of .+)',
+    #               new_doc.get("title")):
+    #     return None
+    if '(list' in new_doc.get("title").lower():
+        print(f"Lista :D: {new_doc.get('title').lower()}")
     # Apply Normalization Form Canonical Decomposition to remove special
     # chars from title
     new_doc["title"] = unicodedata.normalize("NFD", new_doc.get("title"))
@@ -75,22 +76,21 @@ def persist_corpus(data_path: str, uri: str, processes: int):
     file_names = [file_name for file_name in get_files_gen(data_path)]
 
     db.drop_db()
-    db.
 
     with tqdm(total=len(file_names)) as progress:
         for docs in tqdm(ppool.imap_unordered(worker_job, file_names)):
-            insert_documents.extend(docs)
+            # insert_documents.extend(docs)
             progress.update()
 
-    inserted = db.insert_many(insert_documents)
-    print(inserted)
+    # inserted = db.insert_many(insert_documents)
+    # print(inserted)
 
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, required=True,
                         help="Data folder path")
-    parser.add_argument("--uri", type=str, default=Database.default_uri,
+    parser.add_argument("--db-uri", type=str, default=Database.default_uri,
                         help="Full uri of the database")
     parser.add_argument("--processes", type=int, default=10,
                         help="Numbers of processes in the pool")
@@ -100,4 +100,4 @@ def parse_arguments() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_arguments()
-    persist_corpus(args.data, args.uri, args.processes)
+    persist_corpus(args.data, args.db_uri, args.processes)
