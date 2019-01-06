@@ -13,7 +13,18 @@ class AbstractDatabase(ABC):
     def __init__(self, uri):
         self.uri = uri
         self.client = None
+        self.session = None
+        self.transaction = None
         super().__init__()
+
+    # This is just for making a transaction
+    def __enter__(self):
+        # make a database connection and return it
+        ...
+
+    # This is for commiting the transaction
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        ...
 
     @abstractmethod
     def create_db(self):

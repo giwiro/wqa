@@ -9,12 +9,12 @@ DATASET_URL="https://dumps.wikimedia.org/eswiki/latest/$DATASET_FILE"
 DATASET_FOLDER_NAME="dataset/eswiki/"
 DATASET_OUTPUT_FOLDER_NAME="dataset/eswiki/extracted"
 
-if ! [ -x "$(command -v git)" ]; then
+if ! [[ -x "$(command -v git)" ]]; then
     echo "[ERROR] Command 'git' not found :'("
     exit 1
 fi
 
-if ! [ -x "$(command -v $EXTRACTOR_COMMAND)" ]; then
+if ! [[ -x "$(command -v $EXTRACTOR_COMMAND)" ]]; then
     git clone $REPO $FOLDER_NAME
     cd $FOLDER_NAME
     if ! (python3 setup.py install) ; then
@@ -26,7 +26,7 @@ if ! [ -x "$(command -v $EXTRACTOR_COMMAND)" ]; then
     echo "[SUCCESS] Installing '$EXTRACTOR_COMMAND' completed"
 fi
 
-if [ ! -f "$DATASET_FOLDER_NAME$DATASET_FILE_NAME" ]; then
+if [[ ! -f "$DATASET_FOLDER_NAME$DATASET_FILE_NAME" ]]; then
     echo "[ERROR] Dataset: $DATASET_FILE_NAME"
     echo "        was not found on directory: $DATASET_FOLDER_NAME"
     echo "Please download it from: $DATASET_URL"
