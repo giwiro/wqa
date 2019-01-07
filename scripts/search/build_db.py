@@ -7,7 +7,6 @@ import unicodedata
 from multiprocessing.pool import Pool as ProcessPool
 from typing import Dict, Optional
 
-import re
 from tqdm import tqdm
 
 from wqa.database import DatabaseFactory
@@ -34,15 +33,7 @@ def process_doc(doc: Dict) -> Optional[Dict[str, str]]:
         return None
     if '(página de desambiguación)' in new_doc.get("title").lower():
         return None
-
-    # If title contains some link stuff, then ignore it
-    # if regex.match(r'(List of .+)|(Index of .+)|(Outline of .+)',
-    #               new_doc.get("title")):
-    #     return None
-    if '(list' in new_doc.get("title").lower():
-        print(f"Lista :D: {new_doc.get('title').lower()}")
-    # Apply Normalization Form Canonical Decomposition to remove special
-    # chars from title
+    # Apply Normalization Form Canonical Decomposition to normalize special chars in unicode
     new_doc["title"] = unicodedata.normalize("NFD", new_doc.get("title"))
     # Unescape some chars (as &gt; &#62; &#x3e;)
     for key, value in new_doc.items():
@@ -60,7 +51,6 @@ def worker_job(file_name: str) -> [Dict[str, str]]:
             processed_doc = process_doc(doc)
             if not processed_doc:
                 continue
-            # t = (processed_doc.get("title"), processed_doc.get("text"))
             d = {"title": processed_doc.get("title"),
                  "text": processed_doc.get("text")}
             docs.append(d)
@@ -69,23 +59,17 @@ def worker_job(file_name: str) -> [Dict[str, str]]:
 
 def persist_corpus(data_path: str, uri: str, processes: int):
     ppool = ProcessPool(processes)
-    insert_documents = []
     file_names = [file_name for file_name in get_files_gen(data_path)]
 
     with Database(uri) as session:
         session.drop_db()
         session.create_db()
-
         session.start_transaction()
 
         with tqdm(total=len(file_names)) as progress:
             for docs in tqdm(ppool.imap_unordered(worker_job, file_names)):
-                # insert_documents.extend(docs)
                 session.insert_many(docs)
                 progress.update()
-
-    # inserted = db.insert_many(insert_documents)
-    # print(inserted)
 
 
 def parse_arguments() -> argparse.Namespace:

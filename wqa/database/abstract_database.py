@@ -17,7 +17,7 @@ class AbstractDatabase(ABC):
         self.transaction = None
         super().__init__()
 
-    # This is just for making a transaction
+    # This is where the session and the connection are created
     def __enter__(self):
         # make a database connection and return it
         ...
